@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover, height=device-height">
-    <title>Private Chat - Like WhatsApp</title>
+    <title>Private Chat - With Stories</title>
     <style>
         * {
             margin: 0;
@@ -24,7 +24,6 @@
             background: #075E54;
         }
 
-        /* Main Container - Full Screen */
         .app-container {
             width: 100%;
             height: 100vh;
@@ -36,7 +35,7 @@
             position: relative;
         }
 
-        /* Header WhatsApp Style */
+        /* Header */
         .whatsapp-header {
             background: #075E54;
             color: white;
@@ -68,10 +67,6 @@
             justify-content: center;
         }
 
-        .menu-icon:active {
-            background: rgba(255,255,255,0.2);
-        }
-
         .header-title {
             font-size: 20px;
             font-weight: 600;
@@ -90,14 +85,10 @@
             color: white;
             width: 40px;
             height: 40px;
-border-radius: 50%;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-        }
-
-        .header-icon:active {
-            background: rgba(255,255,255,0.2);
         }
 
         /* Stories Row */
@@ -183,6 +174,115 @@ border-radius: 50%;
             text-overflow: ellipsis;
         }
 
+        /* Story Viewer Fullscreen */
+        .story-viewer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: black;
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+        }
+
+        .story-viewer-overlay.active {
+            display: flex;
+        }
+
+        .story-viewer-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 16px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .story-viewer-header .user-name {
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .story-viewer-header .close-story {
+            margin-left: auto;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            font-size: 20px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .story-progress-bar-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 8px;
+            display: flex;
+            gap: 6px;
+            z-index: 10;
+        }
+
+        .story-progress-segment {
+            flex: 1;
+            height: 3px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .story-progress-fill {
+            height: 100%;
+            width: 0%;
+            background: white;
+            transition: width 0.1s linear;
+        }
+
+        .story-viewer-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .story-viewer-content img,
+        .story-viewer-content video {
+            max-width: 100%;
+            max-height: 100vh;
+            object-fit: contain;
+        }
+        
+        /* Tombol navigasi story kiri/kanan */
+        .story-nav-left, .story-nav-right {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 20%;
+            background: transparent;
+            z-index: 15;
+            cursor: pointer;
+        }
+        
+        .story-nav-left {
+            left: 0;
+        }
+        
+        .story-nav-right {
+            right: 0;
+        }
+
         /* Tabs */
         .tabs {
             display: flex;
@@ -205,7 +305,7 @@ border-radius: 50%;
             border-bottom: 3px solid #075E54;
         }
 
-        /* Lists Container */
+        /* Lists */
         .lists-container {
             flex: 1;
             overflow-y: auto;
@@ -266,7 +366,19 @@ border-radius: 50%;
             text-overflow: ellipsis;
         }
 
-        /* ========== CHAT AREA - PERBAIKAN UTAMA ========== */
+        .delete-user-btn {
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            color: #e74c3c;
+        }
+
+        /* Chat Area */
         .chat-area {
             position: absolute;
             top: 0;
@@ -285,7 +397,6 @@ border-radius: 50%;
             transform: translateX(0);
         }
 
-        /* Chat Header - FIXED TIDAK SCROLL */
         .chat-header {
             background: #075E54;
             color: white;
@@ -294,7 +405,6 @@ border-radius: 50%;
             align-items: center;
             gap: 12px;
             flex-shrink: 0;
-            z-index: 5;
         }
 
         .back-btn {
@@ -306,13 +416,6 @@ border-radius: 50%;
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .back-btn:active {
-            background: rgba(255,255,255,0.2);
         }
 
         .chat-avatar {
@@ -324,10 +427,8 @@ border-radius: 50%;
             align-items: center;
             justify-content: center;
             font-size: 20px;
-            font-weight: bold;
             color: white;
             overflow: hidden;
-            flex-shrink: 0;
         }
 
         .chat-avatar img {
@@ -350,28 +451,22 @@ border-radius: 50%;
             opacity: 0.85;
         }
 
-        /* ========== CHAT MESSAGES - HANYA INI YANG SCROLL ========== */
         .chat-messages {
             flex: 1;
             overflow-y: auto;
-            overflow-x: hidden;
             padding: 16px;
             display: flex;
             flex-direction: column;
             gap: 8px;
-            /* Background seperti WhatsApp */
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23efeae2"/><circle cx="20" cy="20" r="2" fill="%23d1d7db" opacity="0.5"/><circle cx="80" cy="40" r="1.5" fill="%23d1d7db" opacity="0.5"/><circle cx="40" cy="80" r="2" fill="%23d1d7db" opacity="0.5"/><circle cx="70" cy="15" r="1.5" fill="%23d1d7db" opacity="0.5"/><circle cx="10" cy="70" r="1.8" fill="%23d1d7db" opacity="0.5"/></svg>');
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23efeae2"/><circle cx="20" cy="20" r="2" fill="%23d1d7db" opacity="0.5"/><circle cx="80" cy="40" r="1.5" fill="%23d1d7db" opacity="0.5"/><circle cx="40" cy="80" r="2" fill="%23d1d7db" opacity="0.5"/></svg>');
             background-repeat: repeat;
-            -webkit-overflow-scrolling: touch;
         }
 
-        /* Message Bubbles */
         .message {
             max-width: 75%;
             padding: 8px 12px;
             border-radius: 8px;
             animation: fadeIn 0.2s ease;
-            word-wrap: break-word;
         }
 
         @keyframes fadeIn {
@@ -394,7 +489,6 @@ border-radius: 50%;
         .message-text {
             font-size: 14px;
             color: #111b21;
-            line-height: 1.4;
         }
 
         .message-time {
@@ -404,7 +498,6 @@ border-radius: 50%;
             text-align: right;
         }
 
-        /* ========== CHAT INPUT - TETAP DI BAWAH ========== */
         .chat-input-area {
             background: #f0f2f5;
             padding: 10px 16px;
@@ -413,7 +506,6 @@ border-radius: 50%;
             align-items: center;
             flex-shrink: 0;
             border-top: 1px solid #e0e0e0;
-            z-index: 5;
         }
 
         .chat-input-area input {
@@ -426,10 +518,6 @@ border-radius: 50%;
             background: white;
         }
 
-        .chat-input-area input:focus {
-            outline: none;
-        }
-
         .chat-input-area button {
             width: 45px;
             height: 45px;
@@ -439,28 +527,68 @@ border-radius: 50%;
             color: white;
             cursor: pointer;
             font-size: 20px;
+        }
+
+        /* Story Modal */
+        .story-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 500;
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-shrink: 0;
+            visibility: hidden;
+            opacity: 0;
+            transition: all 0.2s;
         }
 
-        .chat-input-area button:active {
-            background: #128C7E;
+        .story-modal.open {
+            visibility: visible;
+            opacity: 1;
         }
 
-        /* Empty State */
-        .empty-state {
+        .story-modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            width: 90%;
+            max-width: 350px;
             text-align: center;
-            padding: 40px;
-            color: #667781;
         }
 
-        .hidden {
-            display: none;
+        .story-preview {
+            width: 100%;
+            max-height: 200px;
+            border-radius: 12px;
+            margin: 16px 0;
+            object-fit: cover;
         }
 
-        /* Drawer Menu */
+        .media-type-selector {
+            display: flex;
+            gap: 10px;
+            margin: 16px 0;
+        }
+
+        .media-type-btn {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #075E54;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .media-type-btn.active {
+            background: #075E54;
+            color: white;
+        }
+
+        /* Drawer */
         .drawer-overlay {
             position: fixed;
             top: 0;
@@ -530,147 +658,7 @@ border-radius: 50%;
             cursor: pointer;
         }
 
-        /* Story Modal */
-        .story-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.8);
-            z-index: 250;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            visibility: hidden;
-            opacity: 0;
-            transition: visibility 0.2s, opacity 0.2s;
-        }
-
-        .story-modal.open {
-            visibility: visible;
-            opacity: 1;
-        }
-
-        .story-modal-content {
-            background: white;
-            border-radius: 20px;
-            padding: 24px;
-            width: 90%;
-            max-width: 350px;
-            text-align: center;
-        }
-
-        .story-preview {
-            width: 100%;
-            max-height: 300px;
-            border-radius: 12px;
-            margin-bottom: 16px;
-            object-fit: cover;
-        }
-
-        .media-type-selector {
-            display: flex;
-            gap: 10px;
-            margin: 16px 0;
-        }
-
-        .media-type-btn {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #075E54;
-            background: white;
-            border-radius: 10px;
-            cursor: pointer;
-        }
-
-        .media-type-btn.active {
-            background: #075E54;
-            color: white;
-        }
-
-        /* Story Viewer */
-        .story-viewer {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: black;
-            z-index: 300;
-            display: flex;
-            flex-direction: column;
-            visibility: hidden;
-            opacity: 0;
-            transition: visibility 0.3s, opacity 0.3s;
-        }
-
-        .story-viewer.open {
-            visibility: visible;
-            opacity: 1;
-        }
-
-        .story-viewer-header {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            padding: 16px;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent);
-            z-index: 1;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .story-viewer-content {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            cursor: pointer;
-        }
-
-        .story-media {
-            max-width: 100%;
-            max-height: 80vh;
-            border-radius: 16px;
-            object-fit: contain;
-        }
-
-        .story-progress {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: rgba(255,255,255,0.3);
-        }
-
-        .story-progress-bar {
-            height: 100%;
-            background: white;
-            width: 0%;
-            transition: width 0.1s linear;
-        }
-
-        .story-close {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(0,0,0,0.5);
-            border: none;
-            color: white;
-            font-size: 24px;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            z-index: 2;
-        }
-
-        /* Auth Forms */
+        /* Auth */
         .auth-container {
             width: 100%;
             height: 100vh;
@@ -692,13 +680,6 @@ border-radius: 50%;
         .auth-card h2 {
             color: #075E54;
             text-align: center;
-            margin-bottom: 8px;
-        }
-
-        .auth-card p {
-            text-align: center;
-            color: #667781;
-            margin-bottom: 24px;
         }
 
         .auth-input {
@@ -709,10 +690,6 @@ border-radius: 50%;
             font-size: 15px;
             margin-bottom: 16px;
             outline: none;
-        }
-
-        .auth-input:focus {
-            border-color: #075E54;
         }
 
         .auth-btn {
@@ -727,21 +704,14 @@ border-radius: 50%;
             cursor: pointer;
         }
 
-        .auth-btn:active {
-            background: #128C7E;
-        }
-
         .auth-link {
             text-align: center;
             margin-top: 20px;
             color: #667781;
-            font-size: 14px;
         }
 
         .auth-link a {
             color: #075E54;
-            text-decoration: none;
-            font-weight: 600;
             cursor: pointer;
         }
 
@@ -761,34 +731,8 @@ border-radius: 50%;
             cursor: pointer;
         }
 
-        /* Scrollbar */
-        .lists-container::-webkit-scrollbar,
-        .chat-messages::-webkit-scrollbar,
-        .stories-container::-webkit-scrollbar {
-            width: 4px;
-            height: 4px;
-        }
-
-        .lists-container::-webkit-scrollbar-track,
-        .chat-messages::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-
-        .lists-container::-webkit-scrollbar-thumb,
-        .chat-messages::-webkit-scrollbar-thumb {
-            background: #c1c1c1;
-            border-radius: 4px;
-        }
-
-        /* Android Safe Area */
-        @supports (padding-bottom: env(safe-area-inset-bottom)) {
-            .chat-input-area {
-                padding-bottom: calc(10px + env(safe-area-inset-bottom));
-            }
-            .whatsapp-header {
-                padding-top: calc(12px + env(safe-area-inset-top));
-            }
-        }
+        .hidden { display: none; }
+        .empty-state { text-align: center; padding: 40px; color: #667781; }
     </style>
 </head>
 <body>
@@ -814,10 +758,12 @@ border-radius: 50%;
         let currentUser = null;
         let selectedChatUser = null;
         let messagesUnsubscribe = null;
-        let currentStories = [];
+
+        // Story variables
+        let currentStoryList = [];
         let currentStoryIndex = 0;
-        let storyProgressInterval = null;
-        let currentMediaType = 'image';
+        let storyTimer = null;
+        let storyInterval = null;
 
         function escapeHtml(text) {
             if (!text) return '';
@@ -833,11 +779,7 @@ border-radius: 50%;
         function formatTime(timestamp) {
             if (!timestamp) return '';
             const date = new Date(timestamp);
-            const now = new Date();
-            if (date.toDateString() === now.toDateString()) {
-                return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            }
-            return date.toLocaleDateString([], { day: 'numeric', month: 'short' });
+            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         }
 
         window.togglePassword = function(fieldId) {
@@ -852,18 +794,7 @@ border-radius: 50%;
             }
         };
 
-        window.selectMediaType = function(type) {
-            currentMediaType = type;
-            document.querySelectorAll('.media-type-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-            document.getElementById('storyData').value = '';
-            document.getElementById('storyPreview').classList.add('hidden');
-            document.getElementById('storyData').accept = type === 'image' ? 'image/*' : 'video/*';
-        };
-
-        // Register
+        // ========== REGISTER & LOGIN ==========
         window.register = async function() {
             const username = document.getElementById('regUsername').value.trim().toLowerCase();
             const password = document.getElementById('regPassword').value;
@@ -871,14 +802,6 @@ border-radius: 50%;
 
             if (!username || !password || !fullname) {
                 alert('Isi semua field!');
-                return;
-            }
-            if (username.length < 3) {
-                alert('Username minimal 3 karakter');
-                return;
-            }
-            if (password.length < 4) {
-                alert('Password minimal 4 karakter');
                 return;
             }
 
@@ -902,15 +825,9 @@ border-radius: 50%;
             showLogin();
         };
 
-        // Login
         window.login = async function() {
             const username = document.getElementById('loginUsername').value.trim().toLowerCase();
             const password = document.getElementById('loginPassword').value;
-
-            if (!username || !password) {
-                alert('Masukkan username dan password!');
-                return;
-            }
 
             const userRef = ref(db, `users/${username}`);
             const snapshot = await get(userRef);
@@ -934,7 +851,6 @@ border-radius: 50%;
             loadMainApp();
         };
 
-        // Logout
         window.logout = async function() {
             if (currentUser) {
                 await update(ref(db, `users/${currentUser.username}`), { online: false, lastSeen: Date.now() });
@@ -944,18 +860,55 @@ border-radius: 50%;
             showLogin();
         };
 
-        // Create Story
+        // ========== DELETE USER ==========
+        window.deleteUser = async function(usernameToDelete, event) {
+            event.stopPropagation();
+            if (usernameToDelete === currentUser.username) {
+                alert('Tidak bisa menghapus akun sendiri!');
+                return;
+            }
+            
+            if (!confirm(`Yakin ingin menghapus user @${usernameToDelete}?`)) return;
+            
+            await remove(ref(db, `users/${usernameToDelete}`));
+            await remove(ref(db, `messages/${[currentUser.username, usernameToDelete].sort().join('_')}`));
+            await remove(ref(db, `userChats/${currentUser.username}/${usernameToDelete}`));
+            
+            const storiesRef = ref(db, 'stories');
+            const storiesSnap = await get(storiesRef);
+            if (storiesSnap.exists()) {
+                for (const [id, story] of Object.entries(storiesSnap.val())) {
+                    if (story.userId === usernameToDelete) {
+                        await remove(ref(db, `stories/${id}`));
+                    }
+                }
+            }
+            
+            alert(`User @${usernameToDelete} berhasil dihapus!`);
+            loadUsersList();
+            loadChatsList();
+        };
+
+        // ========== STORY FUNCTIONS ==========
         window.createStory = function() {
             document.getElementById('storyModal').classList.add('open');
-            currentMediaType = 'image';
+            document.getElementById('storyData').value = '';
+            document.getElementById('storyPreview').classList.add('hidden');
+            document.getElementById('storyPreview').src = '';
+            document.querySelectorAll('.media-type-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector('.media-type-btn:first-child').classList.add('active');
             document.getElementById('storyData').accept = 'image/*';
         };
 
         window.closeStoryModal = function() {
             document.getElementById('storyModal').classList.remove('open');
-            document.getElementById('storyData').value = '';
-            document.getElementById('storyPreview').classList.add('hidden');
-            document.getElementById('storyPreview').src = '';
+        };
+
+        window.selectMediaType = function(type, btnElement) {
+            if (!btnElement && event && event.target) btnElement = event.target;
+            document.querySelectorAll('.media-type-btn').forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+            document.getElementById('storyData').accept = type === 'image' ? 'image/*' : 'video/*';
         };
 
         window.previewStoryMedia = function(event) {
@@ -974,8 +927,11 @@ border-radius: 50%;
         window.postStory = async function() {
             const fileInput = document.getElementById('storyData');
             const file = fileInput.files[0];
+            const activeBtn = document.querySelector('.media-type-btn.active');
+            const mediaType = activeBtn.innerText.includes('Image') ? 'image' : 'video';
+            
             if (!file) {
-                alert('Pilih media untuk story!');
+                alert('Pilih gambar atau video untuk story!');
                 return;
             }
 
@@ -986,136 +942,186 @@ border-radius: 50%;
                     userName: currentUser.fullname,
                     userAvatar: currentUser.photoURL || currentUser.avatar,
                     mediaUrl: e.target.result,
-                    mediaType: currentMediaType,
+                    mediaType: mediaType,
                     timestamp: Date.now(),
                     expiresAt: Date.now() + (24 * 60 * 60 * 1000),
                     viewedBy: {}
                 };
 
-                const storyRef = push(ref(db, 'stories'));
-                await set(storyRef, storyData);
+                await push(ref(db, 'stories'), storyData);
                 alert('Story berhasil diposting!');
                 closeStoryModal();
             };
             reader.readAsDataURL(file);
         };
 
-        // View Story
-        window.viewStory = async function(stories, index) {
-            currentStories = stories;
-            currentStoryIndex = index;
-            
-            const story = currentStories[currentStoryIndex];
-            
-            if (story.viewedBy && story.viewedBy[currentUser.username]) {
-                alert('Story sudah pernah dilihat!');
+        // VIEW STORY 
+        window.openStoryViewer = function(storiesJson, index) {
+            let stories = storiesJson;
+            if (typeof storiesJson === 'string') {
+                try {
+                    stories = JSON.parse(storiesJson);
+                } catch(e) { stories = []; }
+            }
+            if (!stories || stories.length === 0) {
+                alert('Tidak ada story untuk dilihat!');
                 return;
             }
             
-            const storyRef = ref(db, `stories/${story.id}/viewedBy/${currentUser.username}`);
-            await set(storyRef, true);
+            currentStoryList = stories;
+            currentStoryIndex = index;
             
-            document.getElementById('storyViewer').classList.add('open');
-            showCurrentStory();
-            startStoryProgress();
+            const viewer = document.getElementById('storyViewerOverlay');
+            viewer.classList.add('active');
+            
+            displayCurrentStory();
         };
 
-        async function deleteStoryAfterView(storyId) {
-            await remove(ref(db, `stories/${storyId}`));
+        function displayCurrentStory() {
+            if (!currentStoryList[currentStoryIndex]) return;
+            
+            const story = currentStoryList[currentStoryIndex];
+            const contentDiv = document.getElementById('storyViewerContent');
+            const userNameSpan = document.getElementById('storyViewerUserName');
+            const progressContainer = document.getElementById('storyProgressContainer');
+            
+            userNameSpan.textContent = story.userName;
+            
+            // Hapus event listener lama dengan membuat ulang DOM
+            if (story.mediaType === 'video') {
+                contentDiv.innerHTML = `<div class="story-nav-left" onclick="event.stopPropagation(); prevStory()"></div>
+                                        <div class="story-nav-right" onclick="event.stopPropagation(); nextStory()"></div>
+                                        <video id="storyVideo" autoplay playsinline src="${story.mediaUrl}" style="max-width:100%; max-height:100vh;"></video>`;
+                const video = document.getElementById('storyVideo');
+                if (video) {
+                    video.onended = function() {
+                        nextStory();
+                    };
+                    video.onerror = function() {
+                        console.log("Video error, skip ke next");
+                        nextStory();
+                    };
+                    // Untuk memastikan video bisa diputar (interaksi user diperlukan, tapi autoplay sudah ada)
+                    video.play().catch(e => console.log("Autoplay mungkin diblokir:", e));
+                }
+            } else {
+                contentDiv.innerHTML = `<div class="story-nav-left" onclick="event.stopPropagation(); prevStory()"></div>
+                                        <div class="story-nav-right" onclick="event.stopPropagation(); nextStory()"></div>
+                                        <img src="${story.mediaUrl}" style="max-width:100%; max-height:100vh;">`;
+            }
+            
+            // Buat progress bar untuk semua story
+            let progressHtml = '';
+            currentStoryList.forEach((s, i) => {
+                progressHtml += `
+                    <div class="story-progress-segment">
+                        <div class="story-progress-fill" id="progressFill_${i}"></div>
+                    </div>
+                `;
+            });
+            progressContainer.innerHTML = progressHtml;
+            
+            markStoryAsViewed(story.id);
+            startStoryTimer(story);
         }
 
-        function showCurrentStory() {
-            const story = currentStories[currentStoryIndex];
-            const mediaElement = document.getElementById('storyMedia');
-            
-            document.getElementById('storyUserName').innerText = story.userName;
-            
-            if (story.mediaType === 'video') {
-                mediaElement.innerHTML = `<video id="storyVideo" class="story-media" autoplay playsinline onended="closeStoryViewerAndDelete()" src="${story.mediaUrl}"></video>`;
-                const video = document.getElementById('storyVideo');
-                if (video) video.load();
-            } else {
-                mediaElement.innerHTML = `<img id="storyImage" class="story-media" src="${story.mediaUrl}" alt="Story">`;
+        async function markStoryAsViewed(storyId) {
+            if (storyId) {
+                await update(ref(db, `stories/${storyId}/viewedBy/${currentUser.username}`), true);
             }
         }
 
-        function startStoryProgress() {
-            if (storyProgressInterval) clearInterval(storyProgressInterval);
+        function startStoryTimer(story) {
+            if (storyTimer) clearTimeout(storyTimer);
+            if (storyInterval) clearInterval(storyInterval);
             
-            const story = currentStories[currentStoryIndex];
             let duration = 5000;
             
             if (story.mediaType === 'video') {
                 const video = document.getElementById('storyVideo');
-                if (video && video.duration) duration = video.duration * 1000;
+                if (video && video.duration && isFinite(video.duration) && video.duration > 0) {
+                    duration = video.duration * 1000;
+                } else {
+                    duration = 5000;
+                }
             }
             
-            let progress = 0;
-            const bar = document.getElementById('storyProgressBar');
-            bar.style.width = '0%';
-            const intervalTime = 50;
-            const step = (intervalTime / duration) * 100;
+            const fill = document.getElementById(`progressFill_${currentStoryIndex}`);
+            if (fill) {
+                fill.style.width = '0%';
+                const stepTime = 50;
+                const steps = Math.max(10, Math.floor(duration / stepTime));
+                let currentStep = 0;
+                
+                storyInterval = setInterval(() => {
+                    currentStep++;
+                    const percent = (currentStep / steps) * 100;
+                    if (fill) fill.style.width = Math.min(percent, 100) + '%';
+                    if (currentStep >= steps) {
+                        clearInterval(storyInterval);
+                    }
+                }, stepTime);
+            }
             
-            storyProgressInterval = setInterval(() => {
-                progress += step;
-                bar.style.width = Math.min(progress, 100) + '%';
-                if (progress >= 100) {
-                    clearInterval(storyProgressInterval);
-                    closeStoryViewerAndDelete();
-                }
-            }, intervalTime);
+            storyTimer = setTimeout(() => {
+                nextStory();
+            }, duration);
         }
 
-        window.closeStoryViewerAndDelete = async function() {
-            if (storyProgressInterval) clearInterval(storyProgressInterval);
+        window.nextStory = function() {
+            if (storyTimer) clearTimeout(storyTimer);
+            if (storyInterval) clearInterval(storyInterval);
             
-            if (currentStories && currentStories[currentStoryIndex]) {
-                await deleteStoryAfterView(currentStories[currentStoryIndex].id);
-            }
-            
-            document.getElementById('storyViewer').classList.remove('open');
-            currentStories = [];
-            loadStories();
-        };
-
-        window.nextStory = async function() {
-            if (currentStories && currentStories[currentStoryIndex]) {
-                await deleteStoryAfterView(currentStories[currentStoryIndex].id);
-            }
-            
-            if (currentStoryIndex < currentStories.length - 1) {
+            if (currentStoryIndex < currentStoryList.length - 1) {
                 currentStoryIndex++;
-                showCurrentStory();
-                startStoryProgress();
+                displayCurrentStory();
             } else {
-                closeStoryViewerAndDelete();
+                closeStoryViewer();
             }
         };
 
-        window.prevStory = async function() {
+        window.prevStory = function() {
+            if (storyTimer) clearTimeout(storyTimer);
+            if (storyInterval) clearInterval(storyInterval);
+            
             if (currentStoryIndex > 0) {
-                if (currentStories && currentStories[currentStoryIndex]) {
-                    await deleteStoryAfterView(currentStories[currentStoryIndex].id);
-                }
                 currentStoryIndex--;
-                showCurrentStory();
-                startStoryProgress();
+                displayCurrentStory();
             }
         };
 
-        // Load Stories
+        window.closeStoryViewer = function() {
+            if (storyTimer) clearTimeout(storyTimer);
+            if (storyInterval) clearInterval(storyInterval);
+            document.getElementById('storyViewerOverlay').classList.remove('active');
+            currentStoryList = [];
+            currentStoryIndex = 0;
+        };
+
+        // Load Stories dari Firebase
         async function loadStories() {
             const storiesRef = ref(db, 'stories');
             const now = Date.now();
             
             onValue(storiesRef, async (snapshot) => {
                 const stories = snapshot.val();
-                const storiesContainer = document.getElementById('storiesList');
-                if (!storiesContainer) return;
+                const container = document.getElementById('storiesList');
+                if (!container) return;
+                
+                if (stories) {
+                    for (const [id, story] of Object.entries(stories)) {
+                        if (story.expiresAt <= now) {
+                            await remove(ref(db, `stories/${id}`));
+                        }
+                    }
+                }
+                
+                const freshSnapshot = await get(storiesRef);
+                const freshStories = freshSnapshot.val();
                 
                 let activeStories = [];
-                if (stories) {
-                    activeStories = Object.entries(stories)
+                if (freshStories) {
+                    activeStories = Object.entries(freshStories)
                         .filter(([id, story]) => {
                             if (story.expiresAt <= now) return false;
                             if (story.viewedBy && story.viewedBy[currentUser.username]) return false;
@@ -1124,21 +1130,13 @@ border-radius: 50%;
                         .map(([id, story]) => ({ id, ...story }));
                 }
                 
-                if (stories) {
-                    Object.entries(stories).forEach(([id, story]) => {
-                        if (story.expiresAt <= now) {
-                            remove(ref(db, `stories/${id}`));
-                        }
-                    });
-                }
-                
                 const userStories = {};
-                activeStories.forEach(story => {
+                for (const story of activeStories) {
                     if (!userStories[story.userId]) {
                         userStories[story.userId] = [];
                     }
                     userStories[story.userId].push(story);
-                });
+                }
                 
                 let storiesHtml = `
                     <div class="story-item" onclick="createStory()">
@@ -1157,9 +1155,10 @@ border-radius: 50%;
                     
                     const firstStory = userStoryList[0];
                     const previewUrl = firstStory.mediaUrl;
+                    const storiesJson = JSON.stringify(userStoryList);
                     
                     storiesHtml += `
-                        <div class="story-item" onclick="viewStory(${JSON.stringify(userStoryList)}, 0)">
+                        <div class="story-item" onclick="openStoryViewer(${storiesJson.replace(/"/g, '&quot;')}, 0)">
                             <div class="story-avatar">
                                 <div class="story-avatar-inner">
                                     ${previewUrl ? `<img src="${previewUrl}">` : (user.photoURL ? `<img src="${user.photoURL}">` : `<div>${user.avatar}</div>`)}
@@ -1170,11 +1169,11 @@ border-radius: 50%;
                     `;
                 }
                 
-                storiesContainer.innerHTML = storiesHtml;
+                container.innerHTML = storiesHtml;
             });
         }
 
-        // Send Message
+        // ========== CHAT FUNCTIONS ==========
         window.sendMessage = async function() {
             if (!selectedChatUser) return;
             const input = document.getElementById('chatInput');
@@ -1182,13 +1181,12 @@ border-radius: 50%;
             if (!text) return;
 
             const chatId = [currentUser.username, selectedChatUser.username].sort().join('_');
-            const message = {
+            await push(ref(db, `messages/${chatId}`), {
                 from: currentUser.username,
                 to: selectedChatUser.username,
                 text: text,
                 timestamp: Date.now()
-            };
-            await push(ref(db, `messages/${chatId}`), message);
+            });
             input.value = '';
             
             await update(ref(db, `userChats/${currentUser.username}/${selectedChatUser.username}`), {
@@ -1196,6 +1194,7 @@ border-radius: 50%;
                 lastMessageTime: Date.now(),
                 lastMessageFrom: currentUser.username
             });
+            
             await update(ref(db, `userChats/${selectedChatUser.username}/${currentUser.username}`), {
                 lastMessage: text,
                 lastMessageTime: Date.now(),
@@ -1203,13 +1202,13 @@ border-radius: 50%;
             });
         };
 
-        // UI Functions
-        function toggleDrawer() {
+        // ========== UI FUNCTIONS ==========
+        window.toggleDrawer = function() {
             const drawer = document.getElementById('drawer');
             const overlay = document.getElementById('drawerOverlay');
             drawer.classList.toggle('open');
             overlay.style.display = drawer.classList.contains('open') ? 'block' : 'none';
-        }
+        };
 
         function closeDrawer() {
             const drawer = document.getElementById('drawer');
@@ -1260,7 +1259,6 @@ border-radius: 50%;
                         <div id="usersList" class="hidden"></div>
                     </div>
 
-                    <!-- Drawer -->
                     <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
                     <div class="drawer" id="drawer">
                         <div class="drawer-header">
@@ -1270,18 +1268,14 @@ border-radius: 50%;
                             <div class="drawer-name">${escapeHtml(currentUser.fullname)}</div>
                             <div>@${currentUser.username}</div>
                         </div>
-                        <div class="drawer-item" onclick="closeDrawer(); createStory()">
-                            <span>⭐</span> <span>Add Story</span>
-                        </div>
                     </div>
 
-                    <!-- Story Modal -->
                     <div class="story-modal" id="storyModal">
                         <div class="story-modal-content">
                             <h3>Add Story</h3>
                             <div class="media-type-selector">
-                                <button class="media-type-btn active" onclick="selectMediaType('image')">📷 Image</button>
-                                <button class="media-type-btn" onclick="selectMediaType('video')">🎥 Video</button>
+                                <button class="media-type-btn active" onclick="selectMediaType('image', this)">📷 Image</button>
+                                <button class="media-type-btn" onclick="selectMediaType('video', this)">🎥 Video</button>
                             </div>
                             <input type="file" id="storyData" accept="image/*" onchange="previewStoryMedia(event)">
                             <img id="storyPreview" class="story-preview hidden">
@@ -1290,19 +1284,15 @@ border-radius: 50%;
                         </div>
                     </div>
 
-                    <!-- Story Viewer -->
-                    <div class="story-viewer" id="storyViewer">
-                        <div class="story-progress"><div class="story-progress-bar" id="storyProgressBar"></div></div>
+                    <div class="story-viewer-overlay" id="storyViewerOverlay">
+                        <div class="story-progress-bar-container" id="storyProgressContainer"></div>
                         <div class="story-viewer-header">
-                            <span id="storyUserName" style="color:white; font-weight:bold;"></span>
+                            <span class="user-name" id="storyViewerUserName">Loading...</span>
+                            <button class="close-story" onclick="closeStoryViewer()">✕</button>
                         </div>
-                        <button class="story-close" onclick="closeStoryViewerAndDelete()">✕</button>
-                        <div class="story-viewer-content" id="storyViewerContent" onclick="nextStory()">
-                            <div id="storyMedia"></div>
-                        </div>
+                        <div class="story-viewer-content" id="storyViewerContent"></div>
                     </div>
 
-                    <!-- Chat Area -->
                     <div class="chat-area" id="chatArea">
                         <div class="chat-header">
                             <button class="back-btn" onclick="closeChat()">←</button>
@@ -1312,9 +1302,7 @@ border-radius: 50%;
                                 <div class="chat-status" id="chatStatus">Online</div>
                             </div>
                         </div>
-                        <div class="chat-messages" id="chatMessages">
-                            <div class="empty-state">No messages yet</div>
-                        </div>
+                        <div class="chat-messages" id="chatMessages"></div>
                         <div class="chat-input-area">
                             <input type="text" id="chatInput" placeholder="Type a message" onkeypress="if(event.key==='Enter') sendMessage()">
                             <button onclick="sendMessage()">📤</button>
@@ -1362,14 +1350,15 @@ border-radius: 50%;
                 }
 
                 container.innerHTML = usersList.map(user => `
-                    <div class="contact-item" onclick="openChat('${user.username}')">
+                    <div class="contact-item">
                         <div class="avatar-img">
                             ${user.photoURL ? `<img src="${user.photoURL}">` : user.avatar}
                         </div>
-                        <div class="contact-info">
+                        <div class="contact-info" onclick="openChat('${user.username}')">
                             <div class="contact-name">${escapeHtml(user.fullname)}</div>
                             <div class="contact-message">@${user.username}</div>
                         </div>
+                        <button class="delete-user-btn" onclick="deleteUser('${user.username}', event)">🗑️</button>
                     </div>
                 `).join('');
             });
@@ -1404,9 +1393,7 @@ border-radius: 50%;
                         </div>
                         <div class="contact-info">
                             <div class="contact-name">${escapeHtml(chat.fullname)}</div>
-                            <div class="contact-message">
-                                ${chat.lastMessage ? (chat.lastMessageFrom === currentUser.username ? 'You: ' : '') + escapeHtml(chat.lastMessage.substring(0, 30)) : 'Start chatting'}
-                            </div>
+                            <div class="contact-message">${chat.lastMessage ? (chat.lastMessageFrom === currentUser.username ? 'You: ' : '') + escapeHtml(chat.lastMessage.substring(0, 30)) : 'Start chatting'}</div>
                         </div>
                     </div>
                 `).join('');
@@ -1450,7 +1437,7 @@ border-radius: 50%;
                 if (!container) return;
                 
                 if (!messages || Object.keys(messages).length === 0) {
-                    container.innerHTML = '<div class="empty-state">✨ No messages yet. Start the conversation!</div>';
+                    container.innerHTML = '<div class="empty-state">✨ No messages yet</div>';
                     return;
                 }
                 
@@ -1464,7 +1451,6 @@ border-radius: 50%;
                     </div>
                 `).join('');
                 
-                // Auto scroll ke bawah
                 setTimeout(() => {
                     container.scrollTop = container.scrollHeight;
                 }, 100);
@@ -1477,7 +1463,7 @@ border-radius: 50%;
                 <div class="auth-container">
                     <div class="auth-card">
                         <h2>💬 Private Chat</h2>
-                        <p>Secure & Real-time</p>
+                        <p>With Stories</p>
                         <div id="loginForm">
                             <input type="text" id="loginUsername" class="auth-input" placeholder="Username">
                             <div class="password-wrapper">
