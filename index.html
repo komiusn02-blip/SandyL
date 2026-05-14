@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Private Chat - Stories (Once View)</title>
+    <title>Sandy-Ludani</title>
     <style>
         * {
             margin: 0;
@@ -39,6 +39,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            flex-shrink: 0;
         }
 
         .header-left {
@@ -47,7 +48,7 @@
             gap: 12px;
         }
 
-        .menu-icon, .back-icon {
+        .menu-icon {
             font-size: 24px;
             cursor: pointer;
             background: none;
@@ -59,6 +60,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+
+        .menu-icon:active {
+            background: rgba(255,255,255,0.2);
         }
 
         .header-title {
@@ -85,6 +90,10 @@
             justify-content: center;
         }
 
+        .header-icon:active {
+            background: rgba(255,255,255,0.2);
+        }
+
         /* Stories Row */
         .stories-container {
             background: white;
@@ -95,6 +104,7 @@
             display: flex;
             gap: 16px;
             scrollbar-width: thin;
+            flex-shrink: 0;
         }
 
         .story-item {
@@ -128,7 +138,7 @@
             overflow: hidden;
         }
 
-        .story-avatar-inner img, .story-avatar-inner video {
+        .story-avatar-inner img {
             width: 66px;
             height: 66px;
             border-radius: 50%;
@@ -168,7 +178,7 @@
             text-overflow: ellipsis;
         }
 
-        /* Story Viewer Modal */
+        /* Story Viewer */
         .story-viewer {
             position: fixed;
             top: 0;
@@ -179,12 +189,14 @@
             z-index: 300;
             display: flex;
             flex-direction: column;
-            transform: translateY(100%);
-            transition: transform 0.3s ease;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0.3s, opacity 0.3s;
         }
 
         .story-viewer.open {
-            transform: translateY(0);
+            visibility: visible;
+            opacity: 1;
         }
 
         .story-viewer-header {
@@ -259,12 +271,14 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transform: scale(0);
-            transition: transform 0.2s ease;
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0.2s, opacity 0.2s;
         }
 
         .story-modal.open {
-            transform: scale(1);
+            visibility: visible;
+            opacity: 1;
         }
 
         .story-modal-content {
@@ -361,6 +375,11 @@
             object-fit: cover;
         }
 
+        .drawer-name {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
         .drawer-item {
             padding: 14px 20px;
             display: flex;
@@ -374,6 +393,7 @@
             display: flex;
             background: #f0f2f5;
             border-bottom: 1px solid #e0e0e0;
+            flex-shrink: 0;
         }
 
         .tab {
@@ -390,6 +410,7 @@
             border-bottom: 3px solid #075E54;
         }
 
+        /* Lists Container - HANYA YANG DI-SCROLL */
         .lists-container {
             flex: 1;
             overflow-y: auto;
@@ -406,6 +427,10 @@
             cursor: pointer;
         }
 
+        .contact-item:active {
+            background: #f0f2f5;
+        }
+
         .avatar-img {
             width: 55px;
             height: 55px;
@@ -418,6 +443,7 @@
             font-size: 22px;
             color: white;
             overflow: hidden;
+            flex-shrink: 0;
         }
 
         .avatar-img img {
@@ -426,11 +452,26 @@
             object-fit: cover;
         }
 
-        .contact-info { flex: 1; }
-        .contact-name { font-weight: 600; font-size: 16px; }
-        .contact-message { font-size: 13px; color: #667781; }
+        .contact-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .contact-name {
+            font-weight: 600;
+            font-size: 16px;
+            color: #111b21;
+        }
+        
+        .contact-message {
+            font-size: 13px;
+            color: #667781;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
 
-        /* Chat Area */
+        /* Chat Area - Full Screen */
         .chat-area {
             position: absolute;
             top: 0;
@@ -445,7 +486,9 @@
             z-index: 20;
         }
 
-        .chat-area.open { transform: translateX(0); }
+        .chat-area.open {
+            transform: translateX(0);
+        }
 
         .chat-header {
             background: #075E54;
@@ -454,8 +497,63 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            flex-shrink: 0;
         }
 
+        .back-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .back-btn:active {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .chat-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #25D366;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .chat-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .chat-info {
+            flex: 1;
+        }
+
+        .chat-info h3 {
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .chat-status {
+            font-size: 12px;
+            opacity: 0.85;
+        }
+
+        /* Chat Messages - HANYA INI YANG DI-SCROLL */
         .chat-messages {
             flex: 1;
             overflow-y: auto;
@@ -463,36 +561,69 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
+            background-image: repeating-linear-gradient(45deg, #d1d7db15 0px, #d1d7db15 2px, transparent 2px, transparent 6px);
         }
 
         .message {
             max-width: 75%;
             padding: 8px 12px;
             border-radius: 8px;
+            animation: fadeIn 0.2s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .message-sent {
             background: #dcf8c5;
             align-self: flex-end;
+            border-bottom-right-radius: 2px;
         }
 
         .message-received {
             background: white;
             align-self: flex-start;
+            border-bottom-left-radius: 2px;
         }
 
+        .message-text {
+            font-size: 14px;
+            color: #111b21;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+        .message-time {
+            font-size: 10px;
+            color: #667781;
+            margin-top: 4px;
+            text-align: right;
+        }
+
+        /* Chat Input Area - TETAP DI BAWAH */
         .chat-input-area {
             background: #f0f2f5;
             padding: 10px 16px;
             display: flex;
             gap: 12px;
+            align-items: center;
+            flex-shrink: 0;
+            border-top: 1px solid #e0e0e0;
         }
 
         .chat-input-area input {
             flex: 1;
-            padding: 10px 16px;
+            padding: 12px 16px;
             border: none;
             border-radius: 25px;
+            outline: none;
+            font-size: 15px;
+            background: white;
+        }
+
+        .chat-input-area input:focus {
             outline: none;
         }
 
@@ -504,10 +635,26 @@
             background: #075E54;
             color: white;
             cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
         }
 
-        .hidden { display: none; }
-        .empty-state { text-align: center; padding: 40px; color: #667781; }
+        .chat-input-area button:active {
+            background: #128C7E;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #667781;
+        }
+
+        .hidden {
+            display: none;
+        }
 
         /* Auth */
         .auth-container {
@@ -528,14 +675,32 @@
             max-width: 360px;
         }
 
-        .auth-card h2 { color: #075E54; text-align: center; margin-bottom: 8px; }
+        .auth-card h2 {
+            color: #075E54;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .auth-card p {
+            text-align: center;
+            color: #667781;
+            margin-bottom: 24px;
+        }
+
         .auth-input {
             width: 100%;
             padding: 14px 16px;
             border: 1px solid #e0e0e0;
             border-radius: 12px;
+            font-size: 15px;
             margin-bottom: 16px;
+            outline: none;
         }
+
+        .auth-input:focus {
+            border-color: #075E54;
+        }
+
         .auth-btn {
             width: 100%;
             padding: 14px;
@@ -543,12 +708,34 @@
             color: white;
             border: none;
             border-radius: 12px;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
         }
-        .auth-link { text-align: center; margin-top: 20px; color: #667781; }
-        .auth-link a { color: #075E54; cursor: pointer; }
-        .password-wrapper { position: relative; margin-bottom: 16px; }
+
+        .auth-btn:active {
+            background: #128C7E;
+        }
+
+        .auth-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #667781;
+            font-size: 14px;
+        }
+
+        .auth-link a {
+            color: #075E54;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .password-wrapper {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
         .toggle-password {
             position: absolute;
             right: 12px;
@@ -558,6 +745,25 @@
             border: none;
             font-size: 20px;
             cursor: pointer;
+        }
+
+        /* Scrollbar Styling */
+        .lists-container::-webkit-scrollbar,
+        .chat-messages::-webkit-scrollbar,
+        .stories-container::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+
+        .lists-container::-webkit-scrollbar-track,
+        .chat-messages::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .lists-container::-webkit-scrollbar-thumb,
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
         }
     </style>
 </head>
@@ -603,7 +809,11 @@
         function formatTime(timestamp) {
             if (!timestamp) return '';
             const date = new Date(timestamp);
-            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const now = new Date();
+            if (date.toDateString() === now.toDateString()) {
+                return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }
+            return date.toLocaleDateString([], { day: 'numeric', month: 'short' });
         }
 
         window.togglePassword = function(fieldId) {
@@ -639,6 +849,14 @@
                 alert('Isi semua field!');
                 return;
             }
+            if (username.length < 3) {
+                alert('Username minimal 3 karakter');
+                return;
+            }
+            if (password.length < 4) {
+                alert('Password minimal 4 karakter');
+                return;
+            }
 
             const userRef = ref(db, `users/${username}`);
             const snapshot = await get(userRef);
@@ -652,7 +870,7 @@
                 bio: "Halo! Saya menggunakan Private Chat",
                 avatar: getInitial(fullname),
                 photoURL: null,
-                online: false,
+                online: true,
                 lastSeen: Date.now()
             });
 
@@ -664,6 +882,11 @@
         window.login = async function() {
             const username = document.getElementById('loginUsername').value.trim().toLowerCase();
             const password = document.getElementById('loginPassword').value;
+
+            if (!username || !password) {
+                alert('Masukkan username dan password!');
+                return;
+            }
 
             const userRef = ref(db, `users/${username}`);
             const snapshot = await get(userRef);
@@ -728,7 +951,7 @@
             const fileInput = document.getElementById('storyData');
             const file = fileInput.files[0];
             if (!file) {
-                alert('Pilih media (gambar/video) untuk story!');
+                alert('Pilih media untuk story!');
                 return;
             }
 
@@ -753,20 +976,18 @@
             reader.readAsDataURL(file);
         };
 
-        // View Story - Setelah keluar, story LANGSUNG HAPUS dari database
+        // View Story
         window.viewStory = async function(stories, index) {
             currentStories = stories;
             currentStoryIndex = index;
             
             const story = currentStories[currentStoryIndex];
             
-            // Cek apakah sudah pernah dilihat sebelumnya
             if (story.viewedBy && story.viewedBy[currentUser.username]) {
-                alert('Story ini sudah pernah Anda lihat dan sudah tidak tersedia lagi!');
+                alert('Story sudah pernah dilihat!');
                 return;
             }
             
-            // Tandai sebagai sudah dilihat oleh user ini
             const storyRef = ref(db, `stories/${story.id}/viewedBy/${currentUser.username}`);
             await set(storyRef, true);
             
@@ -775,16 +996,12 @@
             startStoryProgress();
         };
 
-        // HAPUS STORY SETELAH DITUTUP/DILIHAT
         async function deleteStoryAfterView(storyId) {
-            // Hapus story dari database setelah dilihat
             await remove(ref(db, `stories/${storyId}`));
-            console.log('Story dihapus karena sudah dilihat');
         }
 
         function showCurrentStory() {
             const story = currentStories[currentStoryIndex];
-            const viewerContent = document.getElementById('storyViewerContent');
             const mediaElement = document.getElementById('storyMedia');
             
             document.getElementById('storyUserName').innerText = story.userName;
@@ -792,10 +1009,7 @@
             if (story.mediaType === 'video') {
                 mediaElement.innerHTML = `<video id="storyVideo" class="story-media" autoplay playsinline onended="closeStoryViewerAndDelete()" src="${story.mediaUrl}"></video>`;
                 const video = document.getElementById('storyVideo');
-                if (video) {
-                    video.load();
-                    video.play();
-                }
+                if (video) video.load();
             } else {
                 mediaElement.innerHTML = `<img id="storyImage" class="story-media" src="${story.mediaUrl}" alt="Story">`;
             }
@@ -805,15 +1019,11 @@
             if (storyProgressInterval) clearInterval(storyProgressInterval);
             
             const story = currentStories[currentStoryIndex];
-            let duration = 5000; // 5 detik untuk gambar
+            let duration = 5000;
             
             if (story.mediaType === 'video') {
                 const video = document.getElementById('storyVideo');
-                if (video && video.duration) {
-                    duration = video.duration * 1000;
-                } else {
-                    duration = 5000;
-                }
+                if (video && video.duration) duration = video.duration * 1000;
             }
             
             let progress = 0;
@@ -832,26 +1042,19 @@
             }, intervalTime);
         }
 
-        // Fungsi untuk menutup viewer dan MENGHAPUS story
         window.closeStoryViewerAndDelete = async function() {
             if (storyProgressInterval) clearInterval(storyProgressInterval);
             
-            // Hapus story yang sedang dilihat dari database
             if (currentStories && currentStories[currentStoryIndex]) {
-                const currentStory = currentStories[currentStoryIndex];
-                await deleteStoryAfterView(currentStory.id);
+                await deleteStoryAfterView(currentStories[currentStoryIndex].id);
             }
             
             document.getElementById('storyViewer').classList.remove('open');
             currentStories = [];
-            
-            // Refresh stories list
             loadStories();
         };
 
-        // Navigasi story berikutnya dengan penghapusan
         window.nextStory = async function() {
-            // Hapus story yang sedang dilihat
             if (currentStories && currentStories[currentStoryIndex]) {
                 await deleteStoryAfterView(currentStories[currentStoryIndex].id);
             }
@@ -867,7 +1070,6 @@
 
         window.prevStory = async function() {
             if (currentStoryIndex > 0) {
-                // Hapus story yang sedang dilihat
                 if (currentStories && currentStories[currentStoryIndex]) {
                     await deleteStoryAfterView(currentStories[currentStoryIndex].id);
                 }
@@ -877,7 +1079,7 @@
             }
         };
 
-        // Load Stories dari Firebase
+        // Load Stories
         async function loadStories() {
             const storiesRef = ref(db, 'stories');
             const now = Date.now();
@@ -887,21 +1089,17 @@
                 const storiesContainer = document.getElementById('storiesList');
                 if (!storiesContainer) return;
                 
-                // Filter story yang belum expired dan belum dilihat oleh user ini
                 let activeStories = [];
                 if (stories) {
                     activeStories = Object.entries(stories)
                         .filter(([id, story]) => {
-                            // Story belum expired
                             if (story.expiresAt <= now) return false;
-                            // Story belum dilihat oleh user ini
                             if (story.viewedBy && story.viewedBy[currentUser.username]) return false;
                             return true;
                         })
                         .map(([id, story]) => ({ id, ...story }));
                 }
                 
-                // Hapus story expired
                 if (stories) {
                     Object.entries(stories).forEach(([id, story]) => {
                         if (story.expiresAt <= now) {
@@ -910,7 +1108,6 @@
                     });
                 }
                 
-                // Group by user
                 const userStories = {};
                 activeStories.forEach(story => {
                     if (!userStories[story.userId]) {
@@ -919,7 +1116,6 @@
                     userStories[story.userId].push(story);
                 });
                 
-                // Build stories HTML
                 let storiesHtml = `
                     <div class="story-item" onclick="createStory()">
                         <div class="story-avatar"><div class="story-add">+</div></div>
@@ -935,7 +1131,6 @@
                     const user = userSnap.val();
                     if (!user) continue;
                     
-                    // Ada story yang belum dilihat (warna border gradien)
                     const firstStory = userStoryList[0];
                     const previewUrl = firstStory.mediaUrl;
                     
@@ -943,7 +1138,7 @@
                         <div class="story-item" onclick="viewStory(${JSON.stringify(userStoryList)}, 0)">
                             <div class="story-avatar">
                                 <div class="story-avatar-inner">
-                                    ${previewUrl ? `<img src="${previewUrl}" style="object-fit:cover;">` : (user.photoURL ? `<img src="${user.photoURL}">` : `<div>${user.avatar}</div>`)}
+                                    ${previewUrl ? `<img src="${previewUrl}">` : (user.photoURL ? `<img src="${user.photoURL}">` : `<div>${user.avatar}</div>`)}
                                 </div>
                             </div>
                             <div class="story-name">${escapeHtml(user.fullname.split(' ')[0])}</div>
@@ -971,6 +1166,18 @@
             };
             await push(ref(db, `messages/${chatId}`), message);
             input.value = '';
+            
+            // Update last message
+            await update(ref(db, `userChats/${currentUser.username}/${selectedChatUser.username}`), {
+                lastMessage: text,
+                lastMessageTime: Date.now(),
+                lastMessageFrom: currentUser.username
+            });
+            await update(ref(db, `userChats/${selectedChatUser.username}/${currentUser.username}`), {
+                lastMessage: text,
+                lastMessageTime: Date.now(),
+                lastMessageFrom: currentUser.username
+            });
         };
 
         // UI Functions
@@ -1040,6 +1247,9 @@
                             <div class="drawer-name">${escapeHtml(currentUser.fullname)}</div>
                             <div>@${currentUser.username}</div>
                         </div>
+                        <div class="drawer-item" onclick="closeDrawer(); createStory()">
+                            <span>⭐</span> <span>Add Story</span>
+                        </div>
                     </div>
 
                     <!-- Story Modal -->
@@ -1067,17 +1277,16 @@
                         <div class="story-viewer-content" id="storyViewerContent" onclick="nextStory()">
                             <div id="storyMedia"></div>
                         </div>
-                        <div style="position:absolute; bottom:20px; left:0; right:0; text-align:center; color:white; font-size:12px;">
-                            Tap kanan/kiri untuk navigasi
-                        </div>
                     </div>
 
                     <!-- Chat Area -->
                     <div class="chat-area" id="chatArea">
                         <div class="chat-header">
-                            <button class="back-icon" onclick="closeChat()">←</button>
+                            <button class="back-btn" onclick="closeChat()">←</button>
+                            <div class="chat-avatar" id="chatAvatar">?</div>
                             <div class="chat-info">
                                 <h3 id="chatName">Loading...</h3>
+                                <div class="chat-status" id="chatStatus">Online</div>
                             </div>
                         </div>
                         <div class="chat-messages" id="chatMessages"></div>
@@ -1092,6 +1301,21 @@
             loadStories();
             loadChatsList();
             loadUsersList();
+            setupUserStatusListener();
+        }
+
+        function setupUserStatusListener() {
+            const usersRef = ref(db, 'users');
+            onValue(usersRef, () => {
+                if (selectedChatUser) {
+                    get(ref(db, `users/${selectedChatUser.username}`)).then(snap => {
+                        const user = snap.val();
+                        if (user && document.getElementById('chatStatus')) {
+                            document.getElementById('chatStatus').innerHTML = user.online ? '🟢 Online' : '⚫ Offline';
+                        }
+                    });
+                }
+            });
         }
 
         async function loadUsersList() {
@@ -1107,6 +1331,11 @@
                 }
 
                 const usersList = Object.values(users).filter(u => u.username !== currentUser.username);
+                if (usersList.length === 0) {
+                    container.innerHTML = '<div class="empty-state">No other users</div>';
+                    return;
+                }
+
                 container.innerHTML = usersList.map(user => `
                     <div class="contact-item" onclick="openChat('${user.username}')">
                         <div class="avatar-img">
@@ -1128,7 +1357,7 @@
                 const container = document.getElementById('chatsList');
                 if (!container) return;
 
-                if (!chats) {
+                if (!chats || Object.keys(chats).length === 0) {
                     container.innerHTML = '<div class="empty-state">No chats yet</div>';
                     return;
                 }
@@ -1141,6 +1370,8 @@
                 }));
 
                 const validChats = chatList.filter(c => c !== null);
+                validChats.sort((a, b) => (b.lastMessageTime || 0) - (a.lastMessageTime || 0));
+
                 container.innerHTML = validChats.map(chat => `
                     <div class="contact-item" onclick="openChat('${chat.username}')">
                         <div class="avatar-img">
@@ -1148,7 +1379,9 @@
                         </div>
                         <div class="contact-info">
                             <div class="contact-name">${escapeHtml(chat.fullname)}</div>
-                            <div class="contact-message">${chat.lastMessage ? (chat.lastMessageFrom === currentUser.username ? 'You: ' : '') + escapeHtml(chat.lastMessage) : 'Start chatting'}</div>
+                            <div class="contact-message">
+                                ${chat.lastMessage ? (chat.lastMessageFrom === currentUser.username ? 'You: ' : '') + escapeHtml(chat.lastMessage.substring(0, 30)) : 'Start chatting'}
+                            </div>
                         </div>
                     </div>
                 `).join('');
@@ -1159,7 +1392,18 @@
             selectedChatUser = { username };
             const userSnap = await get(ref(db, `users/${username}`));
             const user = userSnap.val();
-            document.getElementById('chatName').innerHTML = escapeHtml(user.fullname);
+            
+            if (user) {
+                document.getElementById('chatName').innerHTML = escapeHtml(user.fullname);
+                const chatAvatar = document.getElementById('chatAvatar');
+                if (user.photoURL) {
+                    chatAvatar.innerHTML = `<img src="${user.photoURL}">`;
+                } else {
+                    chatAvatar.innerHTML = user.avatar;
+                }
+                document.getElementById('chatStatus').innerHTML = user.online ? '🟢 Online' : '⚫ Offline';
+            }
+            
             document.getElementById('chatArea').classList.add('open');
             loadMessages();
         };
@@ -1178,12 +1422,16 @@
             messagesUnsubscribe = onValue(messagesRef, (snapshot) => {
                 const messages = snapshot.val();
                 const container = document.getElementById('chatMessages');
-                if (!messages) {
-                    container.innerHTML = '<div class="empty-state">Start chatting!</div>';
+                if (!container) return;
+                
+                if (!messages || Object.keys(messages).length === 0) {
+                    container.innerHTML = '<div class="empty-state">No messages yet. Start chatting!</div>';
                     return;
                 }
                 
                 const messagesList = Object.values(messages);
+                messagesList.sort((a, b) => a.timestamp - b.timestamp);
+                
                 container.innerHTML = messagesList.map(msg => `
                     <div class="message ${msg.from === currentUser.username ? 'message-sent' : 'message-received'}">
                         <div class="message-text">${escapeHtml(msg.text)}</div>
@@ -1194,15 +1442,6 @@
                 setTimeout(() => {
                     container.scrollTop = container.scrollHeight;
                 }, 100);
-                
-                if (messagesList.length > 0) {
-                    const lastMsg = messagesList[messagesList.length - 1];
-                    update(ref(db, `userChats/${currentUser.username}/${selectedChatUser.username}`), {
-                        lastMessage: lastMsg.text,
-                        lastMessageTime: lastMsg.timestamp,
-                        lastMessageFrom: lastMsg.from
-                    });
-                }
             });
         }
 
@@ -1212,7 +1451,7 @@
                 <div class="auth-container">
                     <div class="auth-card">
                         <h2>💬 Private Chat</h2>
-                        <p>With Stories (Once View)</p>
+                        <p>Secure & Real-time</p>
                         <div id="loginForm">
                             <input type="text" id="loginUsername" class="auth-input" placeholder="Username">
                             <div class="password-wrapper">
@@ -1250,4 +1489,4 @@
         showLogin();
     </script>
 </body>
-</html>
+    </html>
