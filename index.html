@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Telepon Video · Auto Connect</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background: #0b0f1a;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 12px;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: #141a26;
+            border-radius: 40px;
+            padding: 24px 24px 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), 0 0 0 1px #2a3344;
+        }
+
+        .info-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px 20px;
+            margin-bottom: 20px;
+            background: #1a212f;
+            padding: 12px 20px;
+            border-radius: 60px;
+            border: 1px solid #2c364b;
+        }
+
+        .device-info {
+            color: #b2c7e5;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .device-id {
+            background: #0b111e;
+            padding: 6px 18px;
+            border-radius: 40px;
+            border: 1px solid #2e3a52;
+            font-weight: 500;
+            color: #7aa2f0;
+            font-size: 0.85rem;
+        }
+
+        .device-id i {
+            color: #5d7bb3;
+            margin-right: 6px;
+        }
+
+        .status-badge {
+            background: #1b2335;
+            padding: 6px 16px;
+            border-radius: 30px;
+            color: #8ea4cb;
+            font-size: 0.8rem;
+            border: 1px solid #2d3a52;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-badge .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+
+        .dot.green { background: #2ecc71; }
+        .dot.red { background: #e74c5e; }
+        .dot.yellow { background: #f1c40f; }
+        .dot.blue { background: #3498db; }
+        .dot.purple { background: #9b59b6; }
+        .dot.orange { background: #e67e22; }
+
+        .video-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .video-box {
+            background: #1e2636;
+            border-radius: 28px;
+            overflow: hidden;
+            position: relative;
+            aspect-ratio: 4 / 3;
+            box-shadow: inset 0 0 0 1px #2f3a4e, 0 8px 20px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #111827;
+        }
+
+        .video-box video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+            background: #0e141f;
+        }
+
+        .video-box.local video {
+            transform: scaleX(-1);
+        }
+
+        .video-box.remote video {
+            transform: scaleX(1);
+        }
+
+        .video-placeholder {
+            color: #7b8ba3;
+            font-size: 0.9rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .video-placeholder i {
+            font-size: 3.2rem;
+            color: #3e4b62;
+        }
+
+        .video-box .label {
+            position: absolute;
+            bottom: 12px;
+            left: 16px;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(4px);
+            padding: 6px 14px;
+            border-radius: 40px;
+            color: #d3def0;
+            font-size: 0.75rem;
+            font-weight: 500;
+            border: 1px solid #3d4a60;
+        }
+
+        .call-controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 16px 12px;
+            margin-top: 6px;
+        }
+
+        .control-group {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            background: #202a3a;
+            border: none;
+            border-radius: 60px;
+            padding: 14px 24px;
+            min-width: 100px;
+            font-weight: 600;
+            font-size: 1rem;
+            color: #c8d6ec;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: 0 6px 0 #0f141f, 0 4px 12px rgba(0, 0, 0, 0.5);
+            transition: all 0.08s linear;
+            cursor: pointer;
+            border: 1px solid #364153;
+            flex: 1 0 auto;
+            letter-spacing: 0.3px;
+        }
+
+        .btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #0f141f;
+        }
+
+        .btn i {
+            font-size: 1.3rem;
+        }
+
+        .btn-danger {
+            background: #e34a5a;
+            border-color: #ff5e6f;
+            color: white;
+            box-shadow: 0 6px 0 #9e2d3a;
+        }
+
+        .btn-success {
+            background: #1db954;
+            border-color: #3ad06e;
+            color: white;
+            box-shadow: 0 6px 0 #0f7a36;
+        }
+
+        .btn-primary {
+            background: #2d7aff;
+            border-color: #4b8aff;
+            color: white;
+            box-shadow: 0 6px 0 #1a4aaf;
+        }
+
+        .btn-warning {
+            background: #f39c12;
+            border-color: #f1c40f;
+            color: white;
+            box-shadow: 0 6px 0 #b06d0c;
+        }
+
+        .btn:disabled {
+            opacity: 0.45;
+            transform: translateY(2px);
+            box-shadow: 0 3px 0 #0f141f;
+            pointer-events: none;
+        }
+
+        .connection-status {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            margin-top: 12px;
+            padding: 8px 16px;
+            background: #0b111e;
+            border-radius: 40px;
+            border: 1px solid #2e3a52;
+        }
+
+        .connection-status span {
+            color: #7b8ba3;
+            font-size: 0.75rem;
+        }
+
+        .connection-status .peer-count {
+            color: #7aa2f0;
+            font-weight: 600;
+        }
+
+        @media (max-width: 640px) {
+            .video-grid {
+                grid-template-columns: 1fr;
+                gap: 14px;
+            }
+            .video-box {
+                aspect-ratio: 4 / 3;
+            }
+            .btn {
+                min-width: 70px;
+                padding: 12px 18px;
+                font-size: 0.9rem;
+                flex: 1 1 40%;
+            }
+            .info-bar {
+                flex-direction: column;
+                align-items: stretch;
+                border-radius: 30px;
+                gap: 8px;
+            }
+            .device-info {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .container {
+                padding: 16px;
+            }
+            .btn {
+                font-size: 0.8rem;
+                padding: 10px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Info Bar -->
+        <div class="info-bar">
+            <div class="device-info">
+                <i class="fas fa-mobile-alt" style="color:#5d7bb3;"></i>
+                <span>ID:</span>
+                <span class="device-id" id="deviceIdDisplay">
+                    <i class="fas fa-circle" style="color:#2ecc71;font-size:0.5rem;"></i>
+                    <span id="deviceName">Memuat...</span>
+                </span>
+            </div>
+            <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
+                <div class="status-badge">
+                    <span class="dot" id="statusDot"></span>
+                    <span id="statusText">Menghubungkan...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Video Grid -->
+        <div class="video-grid">
+            <div class="video-box local" id="localVideoBox">
+                <video id="localVideo" autoplay muted playsinline></video>
+                <div class="video-placeholder" id="localPlaceholder">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Kamera lokal</span>
+                </div>
+                <span class="label"><i class="fas fa-user"></i> Kamu</span>
+            </div>
+            <div class="video-box remote" id="remoteVideoBox">
+                <video id="remoteVideo" autoplay playsinline></video>
+                <div class="video-placeholder" id="remotePlaceholder">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Menunggu perangkat lain...</span>
+                </div>
+                <span class="label"><i class="fas fa-user-friends"></i> Remote</span>
+            </div>
+        </div>
+
+        <!-- Connection Status -->
+        <div class="connection-status">
+            <i class="fas fa-users" style="color:#5d7bb3;"></i>
+            <span>Peserta terhubung:</span>
+            <span class="peer-count" id="peerCount">0</span>
+            <span style="color:#5d6f8a;">|</span>
+            <span id="connectionInfo">Mencari perangkat lain...</span>
+        </div>
+
+        <!-- Kontrol -->
+        <div class="call-controls">
+            <div class="control-group">
+                <button class="btn btn-danger" id="endCallBtn" disabled>
+                    <i class="fas fa-phone-slash"></i> Akhiri
+                </button>
+                <button class="btn" id="toggleMicBtn">
+                    <i class="fas fa-microphone"></i> Mic
+                </button>
+                <button class="btn" id="toggleCamBtn">
+                    <i class="fas fa-video"></i> Kamera
+                </button>
+                <button class="btn btn-warning" id="reconnectBtn">
+                    <i class="fas fa-sync-alt"></i> Hubungkan Ulang
+                </button>
+            </div>
+        </div>
+        <p style="color:#5d6f8a; font-size:0.7rem; text-align:center; margin-top: 18px; letter-spacing:0.3px;">
+            <i class="fas fa-globe"></i> Buka di perangkat mana saja — <strong>otomatis terhubung tanpa kode!</strong>
+        </p>
+    </div>
+
+    <!-- PeerJS Library -->
+    <script src="https://unpkg.com/peerjs@1.5.1/dist/peerjs.min.js"></script>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // --- DOM Elements ---
+            const localVideo = document.getElementById('localVideo');
+            const remoteVideo = document.getElementById('remoteVideo');
+            const localPlaceholder = document.getElementById('localPlaceholder');
+            const remotePlaceholder = document.getElementById('remotePlaceholder');
+            const deviceNameSpan = document.getElementById('deviceName');
+            const peerCount = document.getElementById('peerCount');
+            const connectionInfo = document.getElementById('connectionInfo');
+            const endCallBtn = document.getElementById('endCallBtn');
+            const toggleMicBtn = document.getElementById('toggleMicBtn');
+            const toggleCamBtn = document.getElementById('toggleCamBtn');
+            const reconnectBtn = document.getElementById('reconnectBtn');
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
+
+            // --- Constants ---
+            const ROOM_ID = 'AUTO-ROOM-2026'; // Fixed room ID for all users
+            const PEERJS_KEY = 'peerjs'; // Default PeerJS cloud server
+
+            // --- State ---
+            let peer = null;
+            let localStream = null;
+            let remoteStream = null;
+            let currentCall = null;
+            let isCallActive = false;
+            let isMicMuted = false;
+            let isCamOff = false;
+            let connectedPeers = [];
+            let isConnecting = false;
+            let reconnectAttempts = 0;
+            let maxReconnectAttempts = 10;
+
+            // --- Status ---
+            function setStatus(text, dotColor) {
+                statusText.textContent = text;
+                statusDot.className = 'dot ' + dotColor;
+            }
+
+            // --- UI Update ---
+            function updateUI() {
+                endCallBtn.disabled = !isCallActive;
+
+                if (localStream) {
+                    localPlaceholder.style.display = 'none';
+                    localVideo.style.display = 'block';
+                } else {
+                    localPlaceholder.style.display = 'flex';
+                    localVideo.style.display = 'none';
+                }
+
+                if (remoteStream) {
+                    remotePlaceholder.style.display = 'none';
+                    remoteVideo.style.display = 'block';
+                } else {
+                    remotePlaceholder.style.display = 'flex';
+                    remoteVideo.style.display = 'none';
+                }
+
+                toggleMicBtn.innerHTML = isMicMuted ?
+                    '<i class="fas fa-microphone-slash"></i> Mati' :
+                    '<i class="fas fa-microphone"></i> Hidup';
+                toggleCamBtn.innerHTML = isCamOff ?
+                    '<i class="fas fa-video-slash"></i> Mati' :
+                    '<i class="fas fa-video"></i> Hidup';
+
+                peerCount.textContent = connectedPeers.length + 1;
+                
+                if (isCallActive) {
+                    connectionInfo.textContent = 'Terhubung dengan ' + connectedPeers.length + ' perangkat';
+                } else if (connectedPeers.length > 0) {
+                    connectionInfo.textContent = 'Ditemukan ' + connectedPeers.length + ' perangkat, menghubungkan...';
+                } else {
+                    connectionInfo.textContent = 'Mencari perangkat lain...';
+                }
+            }
+
+            // --- Get Local Media ---
+            async function getLocalMedia() {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({
+                        video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
+                        audio: { echoCancellation: true, noiseSuppression: true }
+                    });
+                    return stream;
+                } catch (err) {
+                    console.error('Gagal akses kamera/mikrofon:', err);
+                    alert('Izin kamera/mikrofon diperlukan. Pastikan tidak diblokir.');
+                    return null;
+                }
+            }
+
+            // --- Start Local Stream ---
+            async function startLocalStream() {
+                if (localStream) return true;
+                localStream = await getLocalMedia();
+                if (!localStream) return false;
+                localVideo.srcObject = localStream;
+                await localVideo.play().catch(e => console.warn('local play error:', e));
+                updateUI();
+                return true;
+            }
+
+            // --- Generate Device ID ---
+            function generateDeviceId() {
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                let result = '';
+                for (let i = 0; i < 4; i++) {
+                    result += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                return 'DEV-' + result;
+            }
+
+            // --- Initialize Peer ---
+            function initPeer() {
+                if (isConnecting) return;
+                isConnecting = true;
+
+                // Generate unique ID based on room
+                const deviceId = generateDeviceId();
+                const peerId = ROOM_ID + '-' + deviceId;
+
+                deviceNameSpan.textContent = peerId;
+
+                // Destroy old peer if exists
+                if (peer) {
+                    peer.destroy();
+                    peer = null;
+                }
+
+                // Create new peer with cloud signaling
+                peer = new Peer(peerId, {
+                    debug: 2,
+                    config: {
+                        iceServers: [
+                            { urls: 'stun:stun.l.google.com:19302' },
+                            { urls: 'stun:stun1.l.google.com:19302' },
+                            { urls: 'stun:stun2.l.google.com:19302' }
+                        ]
+                    }
+                });
+
+                peer.on('open', (id) => {
+                    console.log('Peer connected:', id);
+                    setStatus('Siap terhubung', 'blue');
+                    isConnecting = false;
+                    reconnectAttempts = 0;
+                    
+                    // Start looking for peers
+                    setTimeout(() => findPeers(), 1000);
+                });
+
+                peer.on('call', (call) => {
+                    handleIncomingCall(call);
+                });
+
+                peer.on('connection', (conn) => {
+                    console.log('Data connection from:', conn.peer);
+                    if (!connectedPeers.includes(conn.peer)) {
+                        connectedPeers.push(conn.peer);
+                        updateUI();
+                        
+                        // Try to call this peer if not in call
+                        if (!isCallActive && connectedPeers.length > 0) {
+                            setTimeout(() => initiateCall(conn.peer), 500);
+                        }
+                    }
+                });
+
+                peer.on('error', (err) => {
+                    console.error('Peer error:', err);
+                    if (err.type === 'unavailable-id') {
+                        // Try with different ID
+                        const newId = ROOM_ID + '-' + generateDeviceId();
+                        deviceNameSpan.textContent = newId;
+                        peer.id = newId;
+                        peer.reconnect();
+                    } else if (err.type === 'network') {
+                        setStatus('Jaringan bermasalah, coba ulang...', 'yellow');
+                        setTimeout(() => reconnect(), 3000);
+                    } else {
+                        setStatus('Error: ' + err.message, 'red');
+                        isConnecting = false;
+                    }
+                });
+
+                peer.on('disconnected', () => {
+                    setStatus('Terputus, menghubungkan ulang...', 'yellow');
+                    peer.reconnect();
+                });
+
+                peer.on('close', () => {
+                    setStatus('Terputus', 'red');
+                    endCall();
+                    connectedPeers = [];
+                    updateUI();
+                    setTimeout(() => reconnect(), 3000);
+                });
+            }
+
+            // --- Find Peers in Room ---
+            function findPeers() {
+                if (!peer || isConnecting) return;
+
+                setStatus('Mencari perangkat lain...', 'orange');
+                
+                // Try to connect to potential peers
+                // We'll try common patterns
+                const baseId = ROOM_ID + '-DEV-';
+                const possibleIds = [];
+
+                // Generate some possible peer IDs
+                for (let i = 0; i < 5; i++) {
+                    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                    let id = '';
+                    for (let j = 0; j < 4; j++) {
+                        id += chars.charAt(Math.floor(Math.random() * chars.length));
+                    }
+                    possibleIds.push(baseId + id);
+                }
+
+                // Also try with common IDs
+                possibleIds.push(baseId + 'A1B2');
+                possibleIds.push(baseId + 'C3D4');
+                possibleIds.push(baseId + 'E5F6');
+
+                // Try to connect to each
+                let found = false;
+                possibleIds.forEach((targetId) => {
+                    if (targetId === peer.id) return;
+                    
+                    try {
+                        const conn = peer.connect(targetId, {
+                            reliable: true
+                        });
+                        conn.on('open', () => {
+                            console.log('Connected to:', targetId);
+                            if (!connectedPeers.includes(targetId)) {
+                                connectedPeers.push(targetId);
+                                updateUI();
+                                found = true;
+                            }
+                        });
+                        
+                        conn.on('error', (err) => {
+                            // Ignore connection errors
+                        });
+                    } catch (e) {
+                        // Ignore
+                    }
+                });
+
+                // If no peers found, try again later
+                if (!found && !isCallActive) {
+                    setTimeout(() => findPeers(), 5000);
+                }
+            }
+
+            // --- Initiate Call ---
+            async function initiateCall(targetPeer) {
+                if (isCallActive) return;
+                if (!targetPeer || targetPeer === peer.id) return;
+
+                const success = await startLocalStream();
+                if (!success) return;
+
+                try {
+                    const call = peer.call(targetPeer, localStream);
+                    if (call) {
+                        currentCall = call;
+                        isCallActive = true;
+                        setStatus('Memanggil...', 'yellow');
+                        updateUI();
+
+                        call.on('stream', (remoteStreamData) => {
+                            remoteStream = remoteStreamData;
+                            remoteVideo.srcObject = remoteStream;
+                            remoteVideo.play().catch(e => console.warn('remote play error:', e));
+                            setStatus('Terhubung!', 'green');
+                            updateUI();
+                        });
+
+                        call.on('close', () => {
+                            endCall();
+                        });
+
+                        call.on('error', (err) => {
+                            console.error('Call error:', err);
+                            endCall();
+                        });
+                    }
+                } catch (err) {
+                    console.error('Error initiating call:', err);
+                    endCall();
+                }
+            }
+
+            // --- Handle Incoming Call ---
+            async function handleIncomingCall(call) {
+                if (isCallActive) {
+                    // Busy, reject
+                    call.close();
+                    return;
+                }
+
+                const success = await startLocalStream();
+                if (!success) {
+                    call.close();
+                    return;
+                }
+
+                // Auto-answer
+                call.answer(localStream);
+                currentCall = call;
+                isCallActive = true;
+                setStatus('Menerima panggilan...', 'yellow');
+                updateUI();
+
+                call.on('stream', (remoteStreamData) => {
+                    remoteStream = remoteStreamData;
+                    remoteVideo.srcObject = remoteStream;
+                    remoteVideo.play().catch(e => console.warn('remote play error:', e));
+                    setStatus('Terhubung!', 'green');
+                    updateUI();
+                });
+
+                call.on('close', () => {
+                    endCall();
+                });
+
+                call.on('error', (err) => {
+                    console.error('Call error:', err);
+                    endCall();
+                });
+
+                // Add to connected peers
+                if (!connectedPeers.includes(call.peer)) {
+                    connectedPeers.push(call.peer);
+                    updateUI();
+                }
+            }
+
+            // --- End Call ---
+            function endCall() {
+                if (currentCall) {
+                    try {
+                        currentCall.close();
+                    } catch (e) {}
+                    currentCall = null;
+                }
+
+                if (remoteStream) {
+                    remoteStream.getTracks().forEach(t => t.stop());
+                    remoteStream = null;
+                    remoteVideo.srcObject = null;
+                }
+
+                isCallActive = false;
+                setStatus('Mencari perangkat...', 'orange');
+                updateUI();
+                remotePlaceholder.style.display = 'flex';
+                remoteVideo.style.display = 'none';
+
+                // Try to reconnect after delay
+                setTimeout(() => {
+                    if (!isCallActive && peer) {
+                        findPeers();
+                    }
+                }, 3000);
+            }
+
+            // --- Reconnect ---
+            function reconnect() {
+                if (reconnectAttempts >= maxReconnectAttempts) {
+                    setStatus('Gagal terhubung, refresh halaman', 'red');
+                    return;
+                }
+                reconnectAttempts++;
+                setStatus('Menghubungkan ulang...', 'yellow');
+                endCall();
+                connectedPeers = [];
+                initPeer();
+            }
+
+            // --- Toggle Mic ---
+            function toggleMic() {
+                if (!localStream) return;
+                const audioTracks = localStream.getAudioTracks();
+                if (audioTracks.length === 0) return;
+                isMicMuted = !isMicMuted;
+                audioTracks.forEach(track => track.enabled = !isMicMuted);
+                updateUI();
+            }
+
+            // --- Toggle Camera ---
+            function toggleCam() {
+                if (!localStream) return;
+                const videoTracks = localStream.getVideoTracks();
+                if (videoTracks.length === 0) return;
+                isCamOff = !isCamOff;
+                videoTracks.forEach(track => track.enabled = !isCamOff);
+                updateUI();
+            }
+
+            // --- Event Listeners ---
+            endCallBtn.addEventListener('click', endCall);
+            toggleMicBtn.addEventListener('click', toggleMic);
+            toggleCamBtn.addEventListener('click', toggleCam);
+            reconnectBtn.addEventListener('click', reconnect);
+
+            // --- Init ---
+            function init() {
+                setStatus('Inisialisasi...', 'purple');
+                startLocalStream().then(() => {
+                    initPeer();
+                });
+                updateUI();
+            }
+
+            // Handle page unload
+            window.addEventListener('beforeunload', () => {
+                if (localStream) {
+                    localStream.getTracks().forEach(t => t.stop());
+                }
+                if (peer) {
+                    peer.destroy();
+                }
+            });
+
+            // --- Start ---
+            init();
+
+            console.log('📞 Telepon Video Auto-Connect siap!');
+            console.log('🆔 Room:', ROOM_ID);
+            console.log('💡 Buka di perangkat mana saja — otomatis terhubung!');
+            console.log('🌐 Menggunakan PeerJS Cloud Signaling Server');
+        })();
+    </script>
+</body>
+</html>
